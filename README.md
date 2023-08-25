@@ -14,4 +14,12 @@ python shop/manage.py runserver
 uvicorn warehouse/main:app --reload
 ```
 
+```bash
+python shop/manage.py createsuperuser
+```
+
+```bash
+python shop/manage.py generate_books 10
+```
+
 
