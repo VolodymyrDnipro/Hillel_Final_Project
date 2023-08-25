@@ -43,20 +43,24 @@ class IndexView(ListView):
         return None
 
     def get_context_data(self, **kwargs):
-        all_books = list(Book.objects.all())
-        random_books = sample(all_books, 8)
+        context = {}
 
-        categories = Category.objects.all()
-        random_categories = sample(list(categories), min(len(categories), 10))
+        all_books = list(Book.objects.all())
+        if all_books:
+            random_books = sample(all_books, 8)
+            context['random_books'] = random_books
 
         all_slides = list(CarouselSlide.objects.all())
-        random_slides = sample(all_slides, 3)
+        if all_slides:
+            random_slides = sample(all_slides, 3)
+            context['random_slides'] = random_slides
 
-        context = {
-            'random_categories': random_categories,
-            'random_books': random_books,
-            'random_slides': random_slides,
-        }
+
+
+        categories = Category.objects.all()
+        if categories:
+            random_categories = sample(list(categories), min(len(categories), 10))
+            context['random_categories'] = random_categories
 
         if self.request.user.is_authenticated:
             cart = Cart.objects.filter(user=self.request.user).first()
@@ -100,9 +104,11 @@ class ContactView(View):
 
     def get_context_data(self, **kwargs):
         context = {}
+
         categories = Category.objects.all()
-        random_categories = sample(list(categories), min(len(categories), 10))
-        context['random_categories'] = random_categories
+        if categories:
+            random_categories = sample(list(categories), min(len(categories), 10))
+            context['random_categories'] = random_categories
         if self.request.user.is_authenticated:
             cart = Cart.objects.filter(user=self.request.user).first()
             if cart:
@@ -180,8 +186,6 @@ class LoginView(FormView):
     success_url = ''
 
 
-
-
 class LoginRequiredColorMixin(LoginRequiredMixin):
     login_url = '/login/'
 
@@ -207,8 +211,9 @@ class BookDetailView(DetailView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
 
-        categories = Category.objects.all()
-        random_categories = sample(list(categories), min(len(categories), 10))
+        if categories:
+            categories = Category.objects.all()
+            random_categories = sample(list(categories), min(len(categories), 10))
 
         context['random_categories'] = random_categories
         if self.request.user.is_authenticated:
@@ -255,8 +260,9 @@ class CartView(LoginRequiredMixin, TemplateView):
             context['total_price'] = total_price
 
         categories = Category.objects.all()
-        random_categories = sample(list(categories), min(len(categories), 10))
-        context['random_categories'] = random_categories
+        if categories:
+            random_categories = sample(list(categories), min(len(categories), 10))
+            context['random_categories'] = random_categories
         if self.request.user.is_authenticated:
             cart = Cart.objects.filter(user=self.request.user).first()
             if cart:
@@ -290,8 +296,9 @@ class UserDetailView(LoginRequiredMixin, TemplateView):
         }
 
         categories = Category.objects.all()
-        random_categories = sample(list(categories), min(len(categories), 10))
-        context['random_categories'] = random_categories
+        if categories:
+            random_categories = sample(list(categories), min(len(categories), 10))
+            context['random_categories'] = random_categories
 
         if user.is_authenticated:
             cart = Cart.objects.filter(user=user).first()
@@ -311,6 +318,7 @@ class UserProfileUpdateForm(forms.ModelForm):
     class Meta:
         model = UserProfile
         fields = ['mobile', 'address', 'country', 'city', 'state', 'zip']
+
 
 class UserUpdateView(LoginRequiredMixin, UpdateView):
     form_class = UserUpdateForm
@@ -365,7 +373,6 @@ class CheckoutView(LoginRequiredMixin, TemplateView):
 
         return redirect('shop_app:order_confirmation')
 
-
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
 
@@ -391,14 +398,16 @@ class CheckoutView(LoginRequiredMixin, TemplateView):
         context['profile_form'] = UserProfileUpdateForm(instance=self.request.user.userprofile)
 
         categories = Category.objects.all()
-        random_categories = sample(list(categories), min(len(categories), 10))
-        context['random_categories'] = random_categories
+        if categories:
+            random_categories = sample(list(categories), min(len(categories), 10))
+            context['random_categories'] = random_categories
         if self.request.user.is_authenticated:
             cart = Cart.objects.filter(user=self.request.user).first()
             if cart:
                 cart_items_count = cart.cartitem_set.aggregate(total_quantity=Sum('quantity'))['total_quantity']
                 context['cart_items_count'] = cart_items_count if cart_items_count else 0
         return context
+
 
 class OrderConfirmationView(LoginRequiredMixin, TemplateView):
     template_name = 'order/order_confirmation.html'

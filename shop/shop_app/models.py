@@ -9,6 +9,9 @@ class Language(models.Model):
     def __str__(self):
         return self.name
 
+    class Meta:
+        app_label = 'shop_app'
+
 
 class Author(models.Model):
     name = models.CharField(max_length=200)
@@ -17,12 +20,18 @@ class Author(models.Model):
     def __str__(self):
         return self.name
 
+    class Meta:
+        app_label = 'shop_app'
+
 
 class Category(models.Model):
     name = models.CharField(max_length=100)
 
     def __str__(self):
         return self.name
+
+    class Meta:
+        app_label = 'shop_app'
 
 
 class Book(models.Model):
@@ -44,7 +53,7 @@ class Book(models.Model):
         return reverse('shop_app:book_detail', args=[str(self.id)])
 
     class Meta:
-        ordering = ['title']
+        app_label = 'shop_app'
 
 
 # # # storage of information about the shopping cart
