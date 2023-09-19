@@ -49,7 +49,6 @@ INSTALLED_APPS = [
     'widget_tweaks',
     'django_celery_results',
     'django_celery_beat',
-    'djcelery_email',
     'shop_app',
 ]
 
@@ -170,10 +169,11 @@ CELERY_TASK_SERIALIZER = 'json'
 CELERY_RESULT_SERIALIZER = 'json'
 CELERY_TIMEZONE = TIME_ZONE
 
-# EMAIL_BACKEND = 'django_celery_email.backends.CeleryEmailBackend'
-EMAIL_BACKEND = env.str('EMAIL_BACKEND')
-NOREPLY_EMAIL = env.str('NOREPLY_EMAIL')
-
+EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+EMAIL_HOST = 'localhost'
+EMAIL_PORT = 1025
+DEFAULT_FROM_EMAIL = 'example_email@example.com'
+NOREPLY_EMAIL = 'noreply@example.com'
 
 CACHES = {
     'default': {

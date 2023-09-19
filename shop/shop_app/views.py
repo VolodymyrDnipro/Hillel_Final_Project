@@ -15,6 +15,7 @@ from django.db import transaction
 from .forms import RegisterForm, BookFilterForm, FeedbackForm
 from .models import Category, CarouselSlide, Book, Cart, CartItem, UserProfile, User, OrderItem, Order
 from django.conf import settings
+from .tasks import send_email_task
 
 
 def page_not_found(request, exception):
@@ -211,8 +212,8 @@ class BookDetailView(DetailView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
 
+        categories = Category.objects.all()
         if categories:
-            categories = Category.objects.all()
             random_categories = sample(list(categories), min(len(categories), 10))
 
         context['random_categories'] = random_categories
@@ -363,6 +364,7 @@ class CheckoutView(LoginRequiredMixin, TemplateView):
                 total_price = sum(cart_item.book.price * cart_item.quantity for cart_item in cart_items)
 
                 order = Order.objects.create(user=request.user, total_price=total_price)
+                send_email_task.delay('Subject', 'Message', 'from@example.com', [request.user.email])
 
                 for cart_item in cart_items:
                     OrderItem.objects.create(order=order, book=cart_item.book, quantity=cart_item.quantity,

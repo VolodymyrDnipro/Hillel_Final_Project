@@ -25,7 +25,26 @@ services:
     ports:
       - "5432:5432"
 
+  wrh_db:
+    container_name: wrh_db
+    image: postgres:15-alpine
+    restart: always
+    environment:
+      - POSTGRES_DB=db_wrh
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
+    volumes:
+      - wrh_db:/var/lib/postgresql/data_wrh
+    ports:
+      - "5433:5432"
+
+  mailhog:
+    image: mailhog/mailhog
+    ports:
+      - "1025:1025"  # SMTP port
+      - "8025:8025"  # Web UI port
 
 volumes:
   redis:
   shop_db:
+  wrh_db:
